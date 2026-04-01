@@ -1,0 +1,188 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta charset="UTF-8">  
+<title>TheOneClaw OS</title>  
+  
+<style>  
+body {  
+  font-family: Arial;  
+  background: #020617;  
+  color: #e2e8f0;  
+  padding: 20px;  
+}  
+h1 { color: #38bdf8; }  
+.phase {  
+  border: 1px solid #334155;  
+  padding: 15px;  
+  margin-bottom: 15px;  
+  border-radius: 10px;  
+}  
+button {  
+  background: #38bdf8;  
+  border: none;  
+  padding: 8px;  
+  margin-top: 10px;  
+  cursor: pointer;  
+  border-radius: 6px;  
+}  
+.done { background: #16a34a !important; }  
+code {  
+  display: block;  
+  background: #000;  
+  padding: 10px;  
+  margin-top: 10px;  
+  border-radius: 6px;  
+}  
+</style>  
+  
+<script>  
+function done(btn){  
+  btn.classList.toggle("done");  
+  btn.innerText = btn.innerText === "Mark Done" ? "Done ✅" : "Mark Done";  
+}  
+</script>  
+  
+</head>  
+  
+<body>  
+  
+<h1>🚀 TheOneClaw OS</h1>  
+<p>Build your personal AI system step-by-step. DO NOT skip phases.</p>  
+  
+<!-- PHASE 1 -->  
+<div class="phase">  
+<h2>PHASE 1 — OpenRouter (Free AI Brain)</h2>  
+  
+<p>1. Go to https://openrouter.ai</p>  
+<p>2. Create account → API Keys → Create Key</p>  
+  
+<code>  
+export OPENROUTER_API_KEY="your-key"  
+</code>  
+  
+<code>  
+curl https://openrouter.ai/api/v1/chat/completions \  
+-H "Authorization: Bearer $OPENROUTER_API_KEY" \  
+-H "Content-Type: application/json" \  
+-d '{"model":"openrouter/free","messages":[{"role":"user","content":"Hello AI"}]}'  
+</code>  
+  
+<p>✅ You should see AI output</p>  
+  
+<button onclick="done(this)">Mark Done</button>  
+</div>  
+  
+<!-- PHASE 2 -->  
+<div class="phase">  
+<h2>PHASE 2 — Local AI Script</h2>  
+  
+<code>  
+pip3 install requests  
+</code>  
+  
+<code>  
+import requests, os  
+  
+r = requests.post(  
+"https://openrouter.ai/api/v1/chat/completions",  
+headers={"Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}"},  
+json={"model":"openrouter/free","messages":[{"role":"user","content":"Explain Python"}]}  
+)  
+  
+print(r.json()["choices"][0]["message"]["content"])  
+</code>  
+  
+<button onclick="done(this)">Mark Done</button>  
+</div>  
+  
+<!-- PHASE 3 -->  
+<div class="phase">  
+<h2>PHASE 3 — Telegram AI Interface</h2>  
+  
+<p>Create bot via @BotFather</p>  
+  
+<code>  
+pip install python-telegram-bot  
+</code>  
+  
+<code>  
+# bot.py  
+from telegram.ext import Updater, CommandHandler  
+import requests, os  
+  
+def ask(update, context):  
+    q = " ".join(context.args)  
+    r = requests.post(  
+        "https://openrouter.ai/api/v1/chat/completions",  
+        headers={"Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}"},  
+        json={"model":"openrouter/free","messages":[{"role":"user","content":q}]  
+    })  
+    update.message.reply_text(r.json()["choices"][0]["message"]["content"])  
+  
+updater = Updater("YOUR_TOKEN")  
+updater.dispatcher.add_handler(CommandHandler("ask", ask))  
+updater.start_polling()  
+updater.idle()  
+</code>  
+  
+<p>Test: /ask what is AI</p>  
+  
+<button onclick="done(this)">Mark Done</button>  
+</div>  
+  
+<!-- PHASE 4 -->  
+<div class="phase">  
+<h2>PHASE 4 — OpenClaw (Agent Layer)</h2>  
+  
+<code>  
+git clone https://github.com/openclaw/openclaw  
+cd openclaw  
+</code>  
+  
+<p>⚠️ This is your agent runtime (always-on brain)</p>  
+  
+<p>Goal:</p>  
+<ul>  
+<li>Replace direct API calls</li>  
+<li>Enable automation</li>  
+<li>Enable skills + tasks</li>  
+</ul>  
+  
+<button onclick="done(this)">Mark Done</button>  
+</div>  
+  
+<!-- PHASE 5 -->  
+<div class="phase">  
+<h2>PHASE 5 — Skills + Learning</h2>  
+  
+<ul>  
+<li>Save prompts as reusable skills</li>  
+<li>Teach agent workflows manually</li>  
+<li>Example: "Summarize PDFs"</li>  
+</ul>  
+  
+<p>OpenClaw supports skill systems and task reuse  [oai_citation:1‡openclawai.net](https://openclawai.net/openclaw-skills/summarize?utm_source=chatgpt.com)</p>  
+  
+<button onclick="done(this)">Mark Done</button>  
+</div>  
+  
+<!-- PHASE 6 -->  
+<div class="phase">  
+<h2>PHASE 6 — Advanced (ONLY AFTER EVERYTHING WORKS)</h2>  
+  
+<ul>  
+<li>Screen recording → feed to AI (manual for now)</li>  
+<li>Hotkeys → trigger scripts</li>  
+<li>Weekly reports (log outputs)</li>  
+<li>Self-play agents (future expansion)</li>  
+<li>Browser automation (Chrome debug attach)</li>  
+</ul>  
+  
+<p>OpenClaw can attach to browser sessions and automate tasks  [oai_citation:2‡Youtube Summary](https://youtubesummary.com/summary/4jI4eXn0wIQ?utm_source=chatgpt.com)</p>  
+  
+<button onclick="done(this)">Mark Done</button>  
+</div>  
+  
+</body>  
+</html>  
