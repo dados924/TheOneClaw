@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TheOneClaw Full Setup Guide</title>
+  <style>
+    :root{
+      --bg:#020617; --panel:#0f172a; --panel2:#111827; --text:#e5e7eb;
+      --muted:#94a3b8; --accent:#38bdf8; --good:#22c55e; --warn:#f59e0b;
+      --bad:#ef4444; --line:#1f2937;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#020617,#0b1120);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.55}
+    header{padding:28px 20px 16px;border-bottom:1px solid var(--line);background:rgba(2,6,23,.85);position:sticky;top:0;backdrop-filter:blur(8px);z-index:10}
+    h1{margin:0 0 8px;color:var(--accent);font-size:30px}
+    .sub{color:var(--muted);max-width:1000px}
+    main{max-width:1100px;margin:0 auto;padding:18px 16px 64px}
+    .card{background:rgba(15,23,42,.92);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+    h2{margin:0 0 10px;font-size:22px;color:#bfdbfe}
+    h3{margin:18px 0 10px;color:#e0f2fe}
+    p{margin:10px 0}
+    .muted{color:var(--muted)}
+    .note{padding:12px 14px;border-left:4px solid var(--accent);background:rgba(56,189,248,.08);border-radius:10px;margin:12px 0}
+    .warn{padding:12px 14px;border-left:4px solid var(--warn);background:rgba(245,158,11,.08);border-radius:10px;margin:12px 0}
+    .good{padding:12px 14px;border-left:4px solid var(--good);background:rgba(34,197,94,.08);border-radius:10px;margin:12px 0}
+    .bad{padding:12px 14px;border-left:4px solid var(--bad);background:rgba(239,68,68,.08);border-radius:10px;margin:12px 0}
+    code, pre{background:#000814;border:1px solid #223046;border-radius:12px;color:#dbeafe}
+    pre{padding:14px;overflow:auto;white-space:pre-wrap}
+    code{padding:2px 6px}
+    ul{margin:10px 0 10px 20px}
+    li{margin:6px 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .small{font-size:14px}
+    .toc a{color:#7dd3fc;text-decoration:none}
+    .toc a:hover{text-decoration:underline}
+    .checklist{display:grid;gap:8px}
+    .item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid #263244;border-radius:10px;background:rgba(17,24,39,.6)}
+    .item input{margin-top:4px;transform:scale(1.1)}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:8px;background:#0c4a6e;color:#dbeafe;border:1px solid #155e75}
+    footer{color:var(--muted);font-size:13px;padding:20px 0 0}
+    .hr{height:1px;background:var(--line);margin:18px 0}
+    @media (max-width:800px){.grid{grid-template-columns:1fr} header{position:static}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>TheOneClaw — Full Setup Guide</h1>
+  <div class="sub">A single top-to-bottom checklist for a $0-first AI assistant stack using OpenRouter free models, Orgo computers, OpenClaw, Telegram, Paperclip, and optional Paperless-ngx.</div>
+</header>
+
+<main>
+  <div class="card">
+    <h2>What this guide is</h2>
+    <p>This guide is built to be followed from top to bottom with no guessing. The first goal is one working AI loop. After that, each tool is added only when the previous step is visibly working.</p>
+    <div class="note">
+      <strong>Verified rule:</strong> OpenRouter’s <code>openrouter/free</code> router is free and routes to free models; OpenClaw supports Telegram and iMessage channels; Orgo’s default computer spec is 4GB RAM / 2 cores; Paperclip starts locally with <code>npx paperclipai onboard --yes</code>; Paperless-ngx has documented setup and Docker-based install options. 
+    </div>
+  </div>
+
+  <div class="card toc">
+    <h2>Simple architecture</h2>
+    <pre>User
+  ↓
+OpenRouter free model
+  ↓
+OpenClaw Gateway
+  ↙            ↘
+Telegram        Orgo cloud computer
+  ↓                 ↓
+Paperclip control plane  →  Paperless-ngx archive (optional)</pre>
+  </div>
+
+  <div class="card">
+    <h2>What you need before starting</h2>
+    <div class="checklist">
+      <label class="item"><input type="checkbox"> A MacBook M1 and a browser</label>
+      <label class="item"><input type="checkbox"> A Telegram account</label>
+      <label class="item"><input type="checkbox"> An OpenRouter account / API key</label>
+      <label class="item"><input type="checkbox"> An Orgo account / API key</label>
+      <label class="item"><input type="checkbox"> Node.js 20+ and pnpm 9.15+ for Paperclip</label>
+      <label class="item"><input type="checkbox"> Python 3 if you want the test scripts</label>
+    </div>
+    <div class="warn">
+      Do not start with Notion, screen recording learning, hotkeys, or self-play until the base loop is working. Those are later layers.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 1 — Get free AI working</h2>
+    <p><strong>Goal:</strong> send one prompt to OpenRouter and get one answer back.</p>
+
+    <h3>1) Make the OpenRouter account</h3>
+    <div class="checklist">
+      <label class="item"><input type="checkbox"> Go to OpenRouter in your browser and create an account.</label>
+      <label class="item"><input type="checkbox"> Create an API key.</label>
+    </div>
+
+    <h3>2) Test the free model router</h3>
+    <pre>export OPENROUTER_API_KEY="your_key_here"
+
+curl https://openrouter.ai/api/v1/chat/completions   -H "Authorization: Bearer $OPENROUTER_API_KEY"   -H "Content-Type: application/json"   -d '{
+    "model": "openrouter/free",
+    "messages": [
+      {"role": "user", "content": "Explain binary search in one paragraph."}
+    ]
+  }'</pre>
+
+    <div class="good">
+      Success looks like: a JSON response with an answer in <code>choices[0].message.content</code>.
+    </div>
+    <div class="bad">
+      Most likely error: bad API key or missing environment variable. Fix: re-copy the key, re-run <code>export OPENROUTER_API_KEY=...</code>, and test again.
+    </div>
+    <p class="muted">Why this works: OpenRouter says the free router is free, and the <code>:free</code> variant is the cheapest way to try free models. <span class="pill">verified</span></p>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 2 — Set up Orgo as the sandbox computer</h2>
+    <p><strong>Goal:</strong> create a cloud computer for tasks that need a real desktop, browser, screenshots, clicks, or file actions.</p>
+
+    <h3>1) Create a workspace</h3>
+    <pre>curl -X POST https://www.orgo.ai/api/workspaces   -H "Authorization: Bearer $ORGO_API_KEY"   -H "Content-Type: application/json"   -d '{"name": "theoneclaw"}'</pre>
+
+    <h3>2) Create a 4GB computer</h3>
+    <pre>curl -X POST https://www.orgo.ai/api/computers   -H "Authorization: Bearer $ORGO_API_KEY"   -H "Content-Type: application/json"   -d '{
+    "workspace_id": "YOUR_WORKSPACE_ID",
+    "name": "sandbox-1",
+    "os": "linux",
+    "ram": 4,
+    "cpu": 2
+  }'</pre>
+
+    <h3>3) Use the computer</h3>
+    <pre># Take a screenshot
+curl https://www.orgo.ai/api/computers/YOUR_COMPUTER_ID/screenshot   -H "Authorization: Bearer $ORGO_API_KEY"
+
+# Click
+curl -X POST https://www.orgo.ai/api/computers/YOUR_COMPUTER_ID/click   -H "Authorization: Bearer $ORGO_API_KEY"   -H "Content-Type: application/json"   -d '{"x":100,"y":200}'</pre>
+
+    <div class="good">
+      Success looks like: the computer exists, responds, and can be controlled.
+    </div>
+    <div class="warn">
+      Free-tier computers auto-stop after 15 minutes of inactivity. Use that to keep costs low and clean up when done.
+    </div>
+    <div class="bad">
+      Most likely error: invalid workspace or computer ID. Fix: create the workspace first, copy the returned ID, then create the computer.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 3 — Install OpenClaw and run the Gateway</h2>
+    <p><strong>Goal:</strong> make OpenClaw the bridge between your chat apps and your agent runtime.</p>
+
+    <h3>1) Install and onboard</h3>
+    <pre>openclaw onboard</pre>
+
+    <p>If you are building manually, OpenClaw’s docs say onboarding is the fastest path. OpenClaw also has a status/doctor flow for diagnostics.</p>
+
+    <h3>2) Verify the Gateway</h3>
+    <pre>openclaw status
+openclaw status --all
+openclaw doctor</pre>
+
+    <div class="good">
+      Success looks like: the gateway is reachable and the doctor report is clean or at least clearly tells you what to fix.
+    </div>
+    <div class="bad">
+      Most likely error: the gateway is not running or the config is missing. Fix: run <code>openclaw onboard</code> again, then <code>openclaw status</code>.
+    </div>
+
+    <h3>3) Create the base config idea</h3>
+    <pre>{
+  "agent": { "workspace": "~/.openclaw/workspace" },
+  "channels": {
+    "telegram": {
+      "botToken": "YOUR_TELEGRAM_BOT_TOKEN",
+      "allowFrom": ["YOUR_TELEGRAM_USER_ID"],
+      "dmPolicy": "pairing"
+    }
+  }
+}</pre>
+
+    <p class="muted">OpenClaw’s docs show Telegram as the fastest chat channel, and DM pairing/allowlists are the recommended safety model. <span class="pill">verified</span></p>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 4 — Connect Telegram</h2>
+    <p><strong>Goal:</strong> message your agent from your phone.</p>
+
+    <h3>1) Make the bot</h3>
+    <div class="checklist">
+      <label class="item"><input type="checkbox"> Open Telegram and talk to <code>@BotFather</code></label>
+      <label class="item"><input type="checkbox"> Create a new bot and copy the token</label>
+    </div>
+
+    <h3>2) Add the bot token to OpenClaw</h3>
+    <pre>export TELEGRAM_BOT_TOKEN="your_bot_token"</pre>
+
+    <p>OpenClaw’s docs say the token can live in <code>channels.telegram.botToken</code> or fallback to <code>TELEGRAM_BOT_TOKEN</code> for the default account.</p>
+
+    <h3>3) Approve your own DM</h3>
+    <pre>openclaw pairing list telegram
+openclaw pairing approve telegram YOUR_CODE</pre>
+
+    <div class="good">
+      Success looks like: you send the bot a DM and OpenClaw replies after the pairing approval.
+    </div>
+    <div class="bad">
+      Most likely error: privacy mode or allowlist issue. Fix: approve pairing, confirm your numeric Telegram user ID, and keep DM policy strict.
+    </div>
+
+    <p class="muted">Telegram supports long polling and webhooks, but OpenClaw’s docs make Telegram the fastest setup path. <span class="pill">verified</span></p>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 5 — Add Paperclip as the control plane</h2>
+    <p><strong>Goal:</strong> use Paperclip for company structure, goals, approvals, budgets, and task ownership.</p>
+
+    <h3>1) Install Paperclip locally</h3>
+    <pre>npx paperclipai onboard --yes</pre>
+
+    <p>Paperclip’s local deployment uses embedded PostgreSQL and starts on <code>http://localhost:3100</code>.</p>
+
+    <h3>2) Create your company</h3>
+    <div class="checklist">
+      <label class="item"><input type="checkbox"> Company name: <code>TheOneClaw</code></label>
+      <label class="item"><input type="checkbox"> Root goal: “Build a safe AI assistant that helps me study, code, research, and manage tasks.”</label>
+    </div>
+
+    <h3>3) Hire the CEO agent</h3>
+    <div class="checklist">
+      <label class="item"><input type="checkbox"> Navigate to Agents → Hire Agent</label>
+      <label class="item"><input type="checkbox"> Adapter: <code>OpenClaw</code></label>
+      <label class="item"><input type="checkbox"> Name: <code>CEO</code></label>
+      <label class="item"><input type="checkbox"> Role: <code>Chief Executive Officer</code></label>
+    </div>
+
+    <h3>4) Approve the CEO strategy</h3>
+    <p>Paperclip says the first CEO strategy must be approved before it can keep delegating work.</p>
+
+    <div class="good">
+      Success looks like: the company exists, the CEO is hired, and the first strategy is approved.
+    </div>
+    <div class="bad">
+      Most likely error: missing Node.js or pnpm. Fix: install Node 20+ and pnpm 9.15+, then run onboarding again.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 6 — Make Paperclip talk to OpenClaw</h2>
+    <p><strong>Goal:</strong> let Paperclip assign work to OpenClaw through an adapter.</p>
+
+    <h3>Recommended path</h3>
+    <pre>{
+  "adapterType": "http",
+  "adapterConfig": {
+    "url": "https://YOUR-OPENCLAW-ENDPOINT/invoke",
+    "method": "POST",
+    "headers": {
+      "Authorization": "Bearer YOUR_OPENCLAW_TOKEN"
+    },
+    "timeoutMs": 30000,
+    "payloadTemplate": {
+      "agentId": "{{agent.id}}",
+      "companyId": "{{company.id}}",
+      "runId": "{{run.id}}"
+    }
+  }
+}</pre>
+
+    <p>Paperclip’s adapter guide says HTTP adapters are for remote agent execution and OpenClaw integration. OpenClaw docs also support webhook security and pairing.</p>
+
+    <div class="warn">
+      If you cannot verify your exact OpenClaw endpoint, stop here and use the local OpenClaw gateway first. Do not invent a URL.
+    </div>
+
+    <div class="good">
+      Success looks like: Paperclip creates a task, OpenClaw receives it, and the reply comes back into the Paperclip run log.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 7 — Turn this into useful daily workflows</h2>
+    <p>Now the system can help with the kinds of work you actually want:</p>
+    <ul>
+      <li>Study prompts, exam revision, flashcards, and summaries</li>
+      <li>Vibecoding tasks: app ideas, small features, game loops, project planning</li>
+      <li>Research outlines and quick reports</li>
+      <li>IT tasks: troubleshoot, explain logs, summarize docs, suggest fixes</li>
+      <li>Creative work: song ideas, image prompts, video outlines, diagrams</li>
+    </ul>
+
+    <div class="note">
+      Use skills folders in OpenClaw when a repeatable workflow becomes useful. OpenClaw’s skills system uses <code>SKILL.md</code> files and supports workspace-level and agent-level skill storage.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 8 — Optional iMessage and shared inbox paths</h2>
+
+    <h3>iMessage</h3>
+    <p>OpenClaw supports iMessage. The docs say the recommended path is BlueBubbles, and the <code>imessage</code> channel exists too. The iMessage path requires Full Disk Access for the Messages database if you use the direct iMessage route.</p>
+
+    <pre>{
+  "channels": {
+    "bluebubbles": {
+      "enabled": true,
+      "dmPolicy": "pairing"
+    }
+  }
+}</pre>
+
+    <div class="warn">
+      This is an optional later phase. Add it only after Telegram is stable.
+    </div>
+
+    <h3>Shared mailbox / Gmail</h3>
+    <p>OpenClaw also has Gmail Pub/Sub automation docs. That path uses Gmail watch → Pub/Sub → OpenClaw webhook, so it is an advanced email bridge rather than the first thing to build.</p>
+  </div>
+
+  <div class="card">
+    <h2>PHASE 9 — Optional Paperless-ngx archive</h2>
+    <p><strong>Goal:</strong> store processed documents in a searchable archive.</p>
+
+    <h3>Docker-style setup</h3>
+    <pre>git clone https://github.com/paperless-ngx/paperless-ngx
+cd paperless-ngx
+docker compose up -d</pre>
+
+    <p>Paperless-ngx’s docs say it is a community-supported document management system with setup, configuration, troubleshooting, and Docker-based installation options.</p>
+
+    <div class="good">
+      Success looks like: the archive opens, documents can be stored, searched, and retrieved.
+    </div>
+    <div class="bad">
+      Most likely error: Docker not installed. Fix: stop here and keep Paperless-ngx for later.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Weekly self-review</h2>
+    <p>Use this each week once the system is running:</p>
+    <ul>
+      <li>What tasks were completed?</li>
+      <li>What got stuck?</li>
+      <li>What took too many tokens or too much time?</li>
+      <li>Which new skill should be saved into an OpenClaw skill folder?</li>
+      <li>What should be automated next?</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>First success test</h2>
+    <pre>/ask explain loops like I am learning Python</pre>
+    <p>Expected result: the bot replies with a short, clear explanation and does not ask you to configure anything else first.</p>
+  </div>
+
+  <div class="card">
+    <h2>Troubleshooting</h2>
+    <ul>
+      <li><strong>OpenRouter key fails:</strong> re-run the export command and check the header.</li>
+      <li><strong>OpenRouter free router errors:</strong> try again later or use a different <code>:free</code> model.</li>
+      <li><strong>Orgo computer disappears:</strong> free-tier computers auto-stop after inactivity; create it again.</li>
+      <li><strong>OpenClaw not replying:</strong> run <code>openclaw status</code>, then <code>openclaw doctor</code>.</li>
+      <li><strong>Telegram bot silent:</strong> confirm pairing approval and allowlist user ID.</li>
+      <li><strong>Paperclip won’t start:</strong> check Node.js 20+ and pnpm 9.15+.</li>
+      <li><strong>Paperless-ngx install fails:</strong> stop and only use it after the core system works.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>What is intentionally left as later work</h2>
+    <p>Screen recording-to-learning, hotkey-triggered workflows, self-play loops, and Notion automation are powerful ideas, but I left them as later phases because the verified docs here support a safer, smaller build first.</p>
+  </div>
+
+  <footer>
+    Verified sources used to shape this guide: OpenRouter free router docs, Orgo quickstart/API docs, OpenClaw channels/config/FAQ/docs, Paperclip quickstart/local deployment/adapter docs, Telegram Bot API docs, and Paperless-ngx docs.
+  </footer>
+</main>
+</body>
+</html>
